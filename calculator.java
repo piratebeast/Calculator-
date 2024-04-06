@@ -25,6 +25,7 @@ public class calculator {
         JButton btnplus = new JButton("+");
         JButton btnmin = new JButton("-");
         JButton btnmul = new JButton("*");
+        JButton btndiv = new JButton("/");
         JButton btnequal = new JButton("=");
         JButton btnclear = new JButton("Clear");
 
@@ -41,6 +42,7 @@ public class calculator {
         fm.add(btnplus);
         fm.add(btnmin);
         fm.add(btnmul);
+        fm.add(btndiv);
         fm.add(btnequal);
         fm.add(btnclear);
         fm.add(tf);
@@ -55,9 +57,10 @@ public class calculator {
         btn8.setBounds(90, 200, 70, 39);
         btn9.setBounds(160, 200, 70, 39);
         btn0.setBounds(90, 250, 70, 39);
-        btnplus.setBounds(235, 100, 50, 89);
-        btnmin.setBounds(235, 200, 50, 39);
-        btnmul.setBounds(235, 250, 50, 39);
+        btnplus.setBounds(235, 100, 50, 39);
+        btnmin.setBounds(235, 150, 50, 39);
+        btnmul.setBounds(235, 200, 50, 39);
+        btndiv.setBounds(235, 250, 50, 39);
         btnequal.setBounds(160, 250, 70, 39);
         btnclear.setBounds(20, 250, 70, 39);
         tf.setBounds(20, 50, 200, 40);
@@ -66,6 +69,8 @@ public class calculator {
         StringBuilder num2 = new StringBuilder();
         final boolean[] isAddition = {true};
         final boolean[] isMultiplication = {true};
+        final boolean[] isSubtraction = {true};
+        final boolean[] isDivision = {true};
 
         btn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -142,8 +147,11 @@ public class calculator {
                 if (!num1.toString().isEmpty()) {
                     num2.append(num1);
                     num1.setLength(0);
-                    tf.setText("");
+                    tf.setText("+");
                     isAddition[0] = true;
+                    isMultiplication[0] = false;
+                    isSubtraction[0] = false;
+                    isDivision[0] = false;
                 }
             }
         });
@@ -153,9 +161,11 @@ public class calculator {
                 if (!num1.toString().isEmpty()) {
                     num2.append(num1);
                     num1.setLength(0);
-                    tf.setText("");
+                    tf.setText("-");
+                    isSubtraction[0] = true;
                     isAddition[0] = false;
                     isMultiplication[0] = false;
+                    isDivision[0] = false;
                 }
             }
         });
@@ -165,30 +175,60 @@ public class calculator {
                 if(!num1.toString().isEmpty()){
                     num2.append(num1);
                     num1.setLength(0);
-                    tf.setText("");
+                    tf.setText("*");
                     isMultiplication[0] = true;
+                    isAddition[0] = false;
+                    isSubtraction[0] = false;
+                    isDivision[0] = false;
+                }
+            }
+        });
+
+        btndiv.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent){
+                if (!num1.toString().isEmpty()) {
+                    num2.append(num1);
+                    num1.setLength(0);
+                    tf.setText("/");
+                    isDivision[0] = true;
+                    isAddition[0] = false;
+                    isSubtraction[0] = false;
+                    isMultiplication[0] = false;
                 }
             }
         });
 
         btnequal.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent){
-
+            public void actionPerformed(ActionEvent actionEvent) {
                 int result;
-                if(isAddition[0]){
-                    result = Integer.parseInt(num2.toString()) + Integer.parseInt(num1.toString());
-                }else if(isMultiplication[0]){
-                    result = Integer.parseInt(num2.toString()) * Integer.parseInt(num1.toString());
+                try {
+                    if (!num1.toString().isEmpty() && !num2.toString().isEmpty()) {
+                        if (isAddition[0]) {
+                            result = Integer.parseInt(num2.toString()) + Integer.parseInt(num1.toString());
+                        } else if (isMultiplication[0]) {
+                            result = Integer.parseInt(num2.toString()) * Integer.parseInt(num1.toString());
+                        } else if (isDivision[0]) {
+                            if (Integer.parseInt(num1.toString()) == 0) {
+                                throw new ArithmeticException("Division by zero is not allowed");
+                            }
+                            result = Integer.parseInt(num2.toString()) / Integer.parseInt(num1.toString());
+                        } else {
+                            result = Integer.parseInt(num2.toString()) - Integer.parseInt(num1.toString());
+                        }
+                        tf.setText(String.valueOf(result));
+                    } else {
+                        tf.setText("Empty operand(s)");
+                    }
+                } catch (NumberFormatException ex) {
+                    tf.setText("Invalid number format");
+                } catch (ArithmeticException ex) {
+                    tf.setText(ex.getMessage());
                 }
-                else {
-                    result = Integer.parseInt(num2.toString()) - Integer.parseInt(num1.toString());
-                }
-
-                tf.setText(String.valueOf(result));
                 num1.setLength(0);
                 num2.setLength(0);
             }
         });
+        
 
         btnclear.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent){
